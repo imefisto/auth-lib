@@ -6,7 +6,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Imefisto\\AuthLib\\": "src/"
+            "Imefisto\\AuthLib\\": "src/",
+            "Imefisto\\AuthLib\\Testing\\": "tests/"
         }
     },
     "authors": [
