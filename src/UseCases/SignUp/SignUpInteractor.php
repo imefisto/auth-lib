@@ -2,19 +2,22 @@
 namespace Imefisto\AuthLib\UseCases\SignUp;
 
 use Imefisto\AuthLib\Domain\UserRepository;
+use Imefisto\AuthLib\UseCases\SignUp\Validators\EmailValidator;
 
 class SignUpInteractor implements SignUpInputPort
 {
     public function __construct(
         private UserRepository $userRepository,
-        private SignUpOutputPort $output
+        private SignUpOutputPort $output,
+        private ?SignUpValidator $validator = new EmailValidator()
     ) {
     }
 
     public function signUp(SignUpRequest $request): void
     {
-        if (!filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
-            $this->output->invalidUsername($request->username);
+        $validation = $this->validator->validate($request);
+        if ($validation->hasErrors()) {
+            $this->output->invalidData($validation);
             return;
         }
 

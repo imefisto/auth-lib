@@ -3,11 +3,13 @@ namespace Imefisto\AuthLib\Testing\UseCases;
 
 use Imefisto\AuthLib\Domain\UserId;
 use Imefisto\AuthLib\Domain\UserRepository;
+use Imefisto\AuthLib\Domain\ValidationResult;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpInteractor;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpInputPort;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpOutputPort;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpRequest;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpResponse;
+use Imefisto\AuthLib\UseCases\SignUp\SignUpValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +19,6 @@ class SignUpInteractorTest extends TestCase
 {
     private MockObject $userRepository;
     private MockObject $output;
-    private MockObject $validator;
     private SignUpInteractor $interactor;
 
     protected function setUp(): void
@@ -93,8 +94,11 @@ class SignUpInteractorTest extends TestCase
                              ->method('createUser');
 
         $this->output->expects($this->once())
-                     ->method('invalidUsername')
-                     ->with($username);
+                     ->method('invalidData')
+                     ->with($this->callback(
+                         function (ValidationResult $validation) use ($username) {
+                             return $validation->getErrors() === ['username' => ["{$username} is not a valid email"]];
+                         }));
 
         $this->interactor->signUp($request);
     }
