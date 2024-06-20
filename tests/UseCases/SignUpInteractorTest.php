@@ -53,4 +53,25 @@ class SignUpInteractorTest extends TestCase
 
         $this->interactor->signUp($request);
     }
+
+    public function testSignUpWithExistingUser(): void
+    {
+        $username = 'user@example.com';
+        $password = 'some-password';
+
+        $request = new SignUpRequest($username, $password);
+
+        $this->userRepository->expects($this->once())
+                             ->method('existsByUsername')
+                             ->with($username)
+                             ->willReturn(true);
+
+        $this->userRepository->expects($this->never())
+                             ->method('createUser');
+
+        $this->output->expects($this->once())
+                     ->method('userAlreadyExists');
+
+        $this->interactor->signUp($request);
+    }
 }
