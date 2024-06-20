@@ -5,13 +5,10 @@ use Imefisto\AuthLib\Domain\UserRepository;
 
 class SignUpInteractor implements SignUpInputPort
 {
-    private UserRepository $userRepository;
-    private SignUpOutputPort $output;
-
-    public function __construct(UserRepository $userRepository, SignUpOutputPort $output)
-    {
-        $this->userRepository = $userRepository;
-        $this->output = $output;
+    public function __construct(
+        private UserRepository $userRepository,
+        private SignUpOutputPort $output
+    ) {
     }
 
     public function signUp(SignUpRequest $request): void
@@ -26,7 +23,11 @@ class SignUpInteractor implements SignUpInputPort
             return;
         }
 
-        $userId = $this->userRepository->createUser($request->username, $request->password);
+        $userId = $this->userRepository->createUser(
+            $request->username,
+            $request->password
+        );
+
         $this->output->userSignedUp(new SignUpResponse($userId));
     }
 }

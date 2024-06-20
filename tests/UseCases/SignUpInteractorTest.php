@@ -24,7 +24,10 @@ class SignUpInteractorTest extends TestCase
     {
         $this->userRepository = $this->createMock(UserRepository::class);
         $this->output = $this->createMock(SignUpOutputPort::class);
-        $this->interactor = new SignUpInteractor($this->userRepository, $this->output);
+        $this->interactor = new SignUpInteractor(
+            $this->userRepository,
+            $this->output
+        );
     }
 
     public function testSignUpWithValidData(): void
@@ -47,9 +50,11 @@ class SignUpInteractorTest extends TestCase
 
         $this->output->expects($this->once())
                      ->method('userSignedUp')
-                     ->with($this->callback(function (SignUpResponse $response) use ($id) {
-                         return (string) $response->userId === $id;
-                     }));
+                     ->with($this->callback(
+                         function (SignUpResponse $response) use ($id) {
+                             return (string) $response->userId === $id;
+                         })
+                     );
 
         $this->interactor->signUp($request);
     }
