@@ -1,31 +1,16 @@
 <?php
+use Imefisto\AuthLib\Domain\ValidationResult;
 use Imefisto\AuthLib\Infrastructure\Persistence\InMemoryUserRepository;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpInteractor;
-use Imefisto\AuthLib\UseCases\SignUp\SignUpOutputPort;
 use Imefisto\AuthLib\UseCases\SignUp\SignUpRequest;
-use Imefisto\AuthLib\UseCases\SignUp\SignUpResponse;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $userRepository = new InMemoryUserRepository();
+require_once __DIR__ . '/common-include.php';
 
 // Create the presenter
-$presenter = new class implements SignUpOutputPort {
-    public function userSignedUp(SignUpResponse $response): void
-    {
-        echo "User signed up with ID: {$response->userId}\n";
-    }
-
-    public function userAlreadyExists(string $username): void
-    {
-        echo "User already exists: $username\n";
-    }
-
-    public function invalidUsername(string $username): void
-    {
-        echo "Invalid username: $username\n";
-    }
-};
+$presenter = buildPresenterImplementation();
 
 $signUpUseCase = new SignUpInteractor($userRepository, $presenter);
 $request = new SignUpRequest('user@example.com', 'securepassword');
