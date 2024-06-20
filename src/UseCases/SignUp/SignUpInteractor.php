@@ -16,8 +16,13 @@ class SignUpInteractor implements SignUpInputPort
 
     public function signUp(SignUpRequest $request): void
     {
+        if (!filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
+            $this->output->invalidUsername($request->username);
+            return;
+        }
+
         if ($this->userRepository->existsByUsername($request->username)) {
-            $this->output->userAlreadyExists();
+            $this->output->userAlreadyExists($request->username);
             return;
         }
 

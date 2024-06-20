@@ -70,7 +70,26 @@ class SignUpInteractorTest extends TestCase
                              ->method('createUser');
 
         $this->output->expects($this->once())
-                     ->method('userAlreadyExists');
+                     ->method('userAlreadyExists')
+                     ->with($username);
+
+        $this->interactor->signUp($request);
+    }
+
+    public function testSignUpWithInvalidUsername(): void
+    {
+        $username = 'invalid-email';
+        $request = new SignUpRequest($username, 'securepassword');
+
+        $this->userRepository->expects($this->never())
+                             ->method('existsByUsername');
+
+        $this->userRepository->expects($this->never())
+                             ->method('createUser');
+
+        $this->output->expects($this->once())
+                     ->method('invalidUsername')
+                     ->with($username);
 
         $this->interactor->signUp($request);
     }
