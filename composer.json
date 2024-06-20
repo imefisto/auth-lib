@@ -1,0 +1,19 @@
+{
+    "name": "imefisto/auth-lib",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^11.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Imefisto\\AuthLib\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ignacio El Kadre",
+            "email": "ignacio.elkadre@gmail.com"
+        }
+    ],
+    "require": {}
+}
