@@ -1,6 +1,7 @@
 <?php
 namespace Imefisto\AuthLib\Infrastructure\Persistence;
 
+use Imefisto\AuthLib\Domain\User;
 use Imefisto\AuthLib\Domain\UserId;
 use Imefisto\AuthLib\Domain\UserRepository;
 
@@ -15,9 +16,9 @@ class InMemoryUserRepository implements UserRepository
         return isset($this->users[$username]);
     }
 
-    public function createUser(string $username, string $password): UserId
+    public function createUser(User $user): UserId
     {
-        $this->users[$username] = $password;
-        return new UserId($username);
+        $this->users[$user->username] = $user->password;
+        return new UserId($user->username);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Imefisto\AuthLib\Testing\UseCases;
 
+use Imefisto\AuthLib\Domain\User;
 use Imefisto\AuthLib\Domain\UserId;
 use Imefisto\AuthLib\Domain\UserRepository;
 use Imefisto\AuthLib\Domain\ValidationResult;
@@ -37,6 +38,7 @@ class SignUpInteractorTest extends TestCase
         $password = 'some-password';
         $id = 'some-user-id';
 
+        $user = new User($username, $password);
         $request = new SignUpRequest($username, $password);
 
         $this->userRepository->expects($this->once())
@@ -46,7 +48,7 @@ class SignUpInteractorTest extends TestCase
 
         $this->userRepository->expects($this->once())
                              ->method('createUser')
-                             ->with($username, $password)
+                             ->with($user)
                              ->willReturn(new UserId($id));
 
         $this->output->expects($this->once())
