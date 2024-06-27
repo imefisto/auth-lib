@@ -1,7 +1,6 @@
 <?php
 namespace Imefisto\AuthLib\UseCases\SignUp;
 
-use Imefisto\AuthLib\Domain\User;
 use Imefisto\AuthLib\Domain\UserRepository;
 use Imefisto\AuthLib\UseCases\SignUp\Validators\EmailValidator;
 
@@ -10,7 +9,8 @@ class SignUpInteractor implements SignUpInputPort
     public function __construct(
         private UserRepository $userRepository,
         private SignUpOutputPort $output,
-        private ?SignUpValidator $validator = new EmailValidator()
+        private ?SignUpValidator $validator = new EmailValidator(),
+        private ?SignUpUserFactory $userFactory = new SignUpUserFactory()
     ) {
     }
 
@@ -27,7 +27,7 @@ class SignUpInteractor implements SignUpInputPort
             return;
         }
 
-        $user = new User($request->username, $request->password);
+        $user = $this->userFactory->createUserFromRequest($request);
         $userId = $this->userRepository->createUser($user);
 
         $this->output->userSignedUp(new SignUpResponse($userId));
