@@ -14,6 +14,12 @@ class LoginInteractor implements LoginInputPort
     public function login(LoginRequest $request): void
     {
         $user = $this->userRepository->findByUsername($request->username);
+
+        if (is_null($user)) {
+            $this->output->userNotFound();
+            return;
+        }
+
         $this->output->userLoggedIn(new LoginResponse($user->getId()));
     }
 }

@@ -60,4 +60,19 @@ class LoginInteractorTest extends TestCase
 
         $this->interactor->login($request);
     }
+
+    public function testLoginWithUserNotFound(): void
+    {
+        $username = 'user@example.com2';
+        $password = 'some-password';
+        $request = new LoginRequest($username, $password);
+
+        $this->userRepository->method('findByUsername')
+                             ->willReturn(null);
+
+        $this->output->expects($this->once())
+                     ->method('userNotFound');
+
+        $this->interactor->login($request);
+    }
 }
