@@ -38,7 +38,9 @@ class SignUpInteractorTest extends TestCase
         $password = 'some-password';
         $id = 'some-user-id';
 
-        $user = new User($username, $password);
+        $user = (new User($username))
+            ->hashPassword($password);
+
         $request = new SignUpRequest($username, $password);
 
         $this->userRepository->expects($this->once())
@@ -48,7 +50,12 @@ class SignUpInteractorTest extends TestCase
 
         $this->userRepository->expects($this->once())
                              ->method('createUser')
-                             ->with($user)
+                             ->with($this->callback(
+                                 function (User $user) use ($username, $password) {
+                                     return $user->username === $username
+                                         && $user->passwordMatches($password);
+                                 })
+                             )
                              ->willReturn(new UserId($id));
 
         $this->output->expects($this->once())
