@@ -20,6 +20,11 @@ class LoginInteractor implements LoginInputPort
             return;
         }
 
+        if (!$user->passwordMatches($request->password)) {
+            $this->output->passwordNotMatch();
+            return;
+        }
+
         $this->output->userLoggedIn(new LoginResponse($user->getId()));
     }
 }

@@ -40,8 +40,9 @@ class LoginInteractorTest extends TestCase
         $password = 'some-password';
         $id = 'some-user-id';
 
-        $user = (new User($username, $password))
-            ->setId(new UserId($id));
+        $user = (new User($username))
+            ->setId(new UserId($id))
+            ->hashPassword($password);
 
         $request = new LoginRequest($username, $password);
 
@@ -72,6 +73,29 @@ class LoginInteractorTest extends TestCase
 
         $this->output->expects($this->once())
                      ->method('userNotFound');
+
+        $this->interactor->login($request);
+    }
+
+    public function testLoginWithInvalidPassword(): void
+    {
+        $username = 'user@example.com';
+        $password = 'some-password';
+        $id = 'some-user-id';
+
+        $user = (new User($username))
+            ->setId(new UserId($id))
+            ->hashPassword($password);
+
+        $request = new LoginRequest($username, 'a-wrong-password');
+
+        $this->userRepository->expects($this->once())
+                             ->method('findByUsername')
+                             ->with($username)
+                             ->willReturn($user);
+
+        $this->output->expects($this->once())
+                     ->method('passwordNotMatch');
 
         $this->interactor->login($request);
     }

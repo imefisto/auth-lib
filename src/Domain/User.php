@@ -7,8 +7,19 @@ class User
 
     public function __construct(
         public readonly string $username,
-        public readonly string $password
+        private string $passwordHash = ''
     ) {
+    }
+
+    public function passwordMatches(string $password): bool
+    {
+        return password_verify($password, $this->passwordHash);
+    }
+
+    public function hashPassword(string $password): self
+    {
+        $this->passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
     }
 
     public function getId(): UserId
