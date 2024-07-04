@@ -11,6 +11,11 @@ class InMemoryUserRepository implements UserRepository
     {
     }
 
+    public function findByUsername(string $username): ?User
+    {
+        return $this->users[$username] ?? null;
+    }
+
     public function existsByUsername(string $username): bool
     {
         return isset($this->users[$username]);
@@ -18,7 +23,9 @@ class InMemoryUserRepository implements UserRepository
 
     public function createUser(User $user): UserId
     {
-        $this->users[$user->username] = $user->password;
-        return new UserId($user->username);
+        $userId = new UserId(bin2hex(random_bytes(16)));
+        $this->users[$user->username] = $user->setId($userId);
+
+        return $userId;
     }
 }
