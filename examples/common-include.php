@@ -47,5 +47,10 @@ function buildLoginPresenterImplementation() {
         {
             echo "Password does not match\n";
         }
+
+        public function roleNotAdmitted(string $role): void
+        {
+            echo "Role not admitted: $role\n";
+        }
     };
 }

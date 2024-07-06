@@ -4,7 +4,7 @@ namespace Imefisto\AuthLib\Domain;
 class User
 {
     private UserId $id;
-    private Role $role;
+    private Role $role = BasicRoles::User;
 
     public function __construct(
         public readonly string $username,
