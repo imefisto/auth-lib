@@ -17,11 +17,15 @@ class SignUpUserFactory
     ): User {
         return (new User($request->username))
             ->hashPassword($request->password)
-            ->setRole($this->getRole());
+            ->setRole($this->getRole($request));
     }
 
-    private function getRole(): Role
+    private function getRole(SignUpRequest $request): Role
     {
+        if ($request->getRole() !== '') {
+            return $this->defaultRole::from($request->getRole());
+        }
+
         return $this->defaultRole;
     }
 }

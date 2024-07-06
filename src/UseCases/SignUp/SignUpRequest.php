@@ -2,12 +2,22 @@
 namespace Imefisto\AuthLib\UseCases\SignUp;
 
 class SignUpRequest {
-    public string $username;
-    public string $password;
+    private string $role = '';
 
-    public function __construct(string $username, string $password)
+    public function __construct(
+        public readonly string $username,
+        public readonly string $password
+    ) {
+    }
+
+    public function withRole(string $role): self
     {
-        $this->username = $username;
-        $this->password = $password;
+        $this->role = $role;
+        return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
     }
 }
