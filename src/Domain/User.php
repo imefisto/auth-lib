@@ -4,6 +4,7 @@ namespace Imefisto\AuthLib\Domain;
 class User
 {
     private UserId $id;
+    private Role $role;
 
     public function __construct(
         public readonly string $username,
@@ -30,6 +31,17 @@ class User
     public function setId(UserId $id): self
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(Role $role): self
+    {
+        $this->role = $role;
         return $this;
     }
 }

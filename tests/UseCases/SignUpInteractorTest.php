@@ -1,6 +1,7 @@
 <?php
 namespace Imefisto\AuthLib\Testing\UseCases;
 
+use Imefisto\AuthLib\Domain\BasicRoles;
 use Imefisto\AuthLib\Domain\User;
 use Imefisto\AuthLib\Domain\UserId;
 use Imefisto\AuthLib\Domain\UserRepository;
@@ -108,6 +109,39 @@ class SignUpInteractorTest extends TestCase
                          function (ValidationResult $validation) use ($username) {
                              return $validation->getErrors() === ['username' => ["{$username} is not a valid email"]];
                          }));
+
+        $this->interactor->signUp($request);
+    }
+
+    public function testSignUpWithDefaultRole(): void
+    {
+        $username = 'user@example.com';
+        $password = 'some-password';
+        $id = 'some-user-id';
+
+        $request = new SignUpRequest($username, $password);
+
+        $this->userRepository->method('existsByUsername')
+                             ->willReturn(false);
+
+        $this->userRepository->expects($this->once())
+                             ->method('createUser')
+                             ->with($this->callback(
+                                 function (User $user) use ($username, $password) {
+                                     return $user->username === $username
+                                         && $user->passwordMatches($password)
+                                         && $user->getRole() === BasicRoles::User;
+                                 })
+                             )
+                             ->willReturn(new UserId($id));
+
+        $this->output->expects($this->once())
+                     ->method('userSignedUp')
+                     ->with($this->callback(
+                         function (SignUpResponse $response) use ($id) {
+                             return (string) $response->userId === $id;
+                         })
+                     );
 
         $this->interactor->signUp($request);
     }
