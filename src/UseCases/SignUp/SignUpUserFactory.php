@@ -2,14 +2,19 @@
 namespace Imefisto\AuthLib\UseCases\SignUp;
 
 use Imefisto\AuthLib\Domain\BasicRoles;
+use Imefisto\AuthLib\Domain\Exceptions\RoleNotAdmittedException;
 use Imefisto\AuthLib\Domain\Role;
+use Imefisto\AuthLib\Domain\RoleList;
 use Imefisto\AuthLib\Domain\User;
 
 class SignUpUserFactory
 {
     public function __construct(
-        private Role $defaultRole = BasicRoles::User
+        private Role $defaultRole = BasicRoles::User,
+        private ?RoleList $admittedRoles = null
     ) {
+        $this->admittedRoles = $admittedRoles
+            ?? (new RoleList())->addRole(BasicRoles::User);
     }
 
     public function createUserFromRequest(
@@ -23,7 +28,12 @@ class SignUpUserFactory
     private function getRole(SignUpRequest $request): Role
     {
         if ($request->getRole() !== '') {
-            return $this->defaultRole::from($request->getRole());
+            $role = $this->defaultRole::from($request->getRole());
+            if ($this->admittedRoles->contains($role)) {
+                return $role;
+            } else {
+                throw new RoleNotAdmittedException($role->getValue());
+            }
         }
 
         return $this->defaultRole;

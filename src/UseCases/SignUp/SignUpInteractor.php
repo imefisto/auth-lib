@@ -1,6 +1,7 @@
 <?php
 namespace Imefisto\AuthLib\UseCases\SignUp;
 
+use Imefisto\AuthLib\Domain\Exceptions\RoleNotAdmittedException;
 use Imefisto\AuthLib\Domain\UserRepository;
 use Imefisto\AuthLib\UseCases\SignUp\Validators\EmailValidator;
 
@@ -27,7 +28,13 @@ class SignUpInteractor implements SignUpInputPort
             return;
         }
 
-        $user = $this->userFactory->createUserFromRequest($request);
+        try {
+            $user = $this->userFactory->createUserFromRequest($request);
+        } catch (RoleNotAdmittedException $e) {
+            $this->output->roleNotAdmitted($e->role);
+            return;
+        }
+
         $userId = $this->userRepository->createUser($user);
 
         $this->output->userSignedUp(new SignUpResponse($userId));

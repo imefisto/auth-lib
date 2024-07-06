@@ -3,6 +3,7 @@ namespace Imefisto\AuthLib\Testing\UseCases;
 
 use Imefisto\AuthLib\Domain\BasicRoles;
 use Imefisto\AuthLib\Domain\Role;
+use Imefisto\AuthLib\Domain\RoleList;
 use Imefisto\AuthLib\Domain\User;
 use Imefisto\AuthLib\Domain\UserId;
 use Imefisto\AuthLib\Domain\UserRepository;
@@ -30,6 +31,7 @@ class SignUpInteractorTest extends TestCase
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->userFactory = new SignUpUserFactory();
         $this->output = $this->createMock(SignUpOutputPort::class);
     }
 
@@ -159,47 +161,46 @@ class SignUpInteractorTest extends TestCase
                                  })
                              );
 
+        $roleList = (new RoleList())
+            ->addRole(BasicRoles::Admin);
+
+        $this->userFactory = new SignUpUserFactory(
+            BasicRoles::User,
+            $roleList
+        );
 
         $this->interactor()->signUp($request);
     }
 
-    // public function testSignUpChoosingAdmittedRoles(): void
-    // {
-    //     $username = 'user@example.com';
-    //     $password = 'some-password';
+    public function testSignUpChoosingAdmittedRoles(): void
+    {
+        $username = 'user@example.com';
+        $password = 'some-password';
 
-    //     $request = new SignUpRequest($username, $password);
+        $request = (new SignUpRequest(
+            $username,
+            $password
+        ))->withRole(BasicRoles::Admin->value);
 
-    //     $this->userRepository->method('existsByUsername')
-    //                          ->willReturn(false);
+        $this->userRepository->method('existsByUsername')
+                             ->willReturn(false);
 
-    //     $this->userRepository->expects($this->once())
-    //                          ->method('createUser')
-    //                          ->with($this->callback(
-    //                              function (User $user) use ($username, $password) {
-    //                                  return $user->username === $username
-    //                                      && $user->passwordMatches($password)
-    //                                      && $user->getRole() === BasicRoles::User;
-    //                              })
-    //                          )
-    //                          ->willReturn(new UserId($id));
+        $this->userRepository->expects($this->never())
+                             ->method('createUser');
 
-    //     $this->output->expects($this->once())
-    //                  ->method('userSignedUp')
-    //                  ->with($this->callback(
-    //                      function (SignUpResponse $response) use ($id) {
-    //                          return (string) $response->userId === $id;
-    //                      })
-    //                  );
+        $this->output->expects($this->once())
+                     ->method('roleNotAdmitted')
+                     ->with('admin');
 
-    //     $this->interactor()->signUp($request);
-    // }
+        $this->interactor()->signUp($request);
+    }
 
     protected function interactor(): SignUpInputPort
     {
         return new SignUpInteractor(
-            $this->userRepository,
-            $this->output
+            userRepository: $this->userRepository,
+            output: $this->output,
+            userFactory: $this->userFactory
         );
     }
 }

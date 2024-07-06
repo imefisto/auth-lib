@@ -23,6 +23,11 @@ function buildPresenterImplementation() {
                 echo "$error\n";
             }
         }
+
+        public function roleNotAdmitted(string $role): void
+        {
+            echo "Role not admitted: $role\n";
+        }
     };
 }
 
